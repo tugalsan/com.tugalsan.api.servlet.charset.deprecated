@@ -1,0 +1,4 @@
+--patch-module
+com.tugalsan.api.servlet.charset.deprecated=_
+--add-reads
+com.tugalsan.api.servlet.charset.deprecated=ALL-UNNAMED
