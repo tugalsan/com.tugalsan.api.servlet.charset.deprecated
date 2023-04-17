@@ -19,7 +19,7 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
 
     @Override
     public void init(FilterConfig config) {
-        TGS_UnSafe.execute(() -> {
+        TGS_UnSafe.run(() -> {
             encoding = config.getInitParameter("requestEncoding");
             if (encoding == null) {
                 encoding = TGS_CharSetUTF8.UTF8;
@@ -30,7 +30,7 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain next) {
-        TGS_UnSafe.execute(() -> {
+        TGS_UnSafe.run(() -> {
 
             //REQUEST.COMMON
             if (null == request.getCharacterEncoding()) {
@@ -56,7 +56,7 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
                 }
                 return;
             }
-            TGS_UnSafe.execute(() -> next.doFilter(request, response));//ESCALATE WITHOUT DEF_CHARSET
+            TGS_UnSafe.run(() -> next.doFilter(request, response));//ESCALATE WITHOUT DEF_CHARSET
         });
     }
 
