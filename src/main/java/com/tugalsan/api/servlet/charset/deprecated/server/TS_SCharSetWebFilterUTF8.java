@@ -4,6 +4,7 @@ import javax.servlet.*;
 import javax.servlet.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import com.tugalsan.api.charset.client.*;
+import com.tugalsan.api.file.client.TGS_FileTypes;
 import com.tugalsan.api.log.server.*;
 import com.tugalsan.api.unsafe.client.*;
 
@@ -37,9 +38,10 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
                 request.setCharacterEncoding(encoding);
             }
 
-            //REQUEST.HTML
-            if (String.valueOf(response.getContentType()).startsWith("text/html")) {
-                response.setContentType("text/html; charset=" + TGS_CharSetUTF8.UTF8);
+            //REQUEST.TEXT
+            var contentType = TGS_FileTypes.findByContenTypePrefix(String.valueOf(response.getContentType()));
+            if (contentType != null && contentType.utf8) {
+                response.setContentType(contentType.content);
             }
 
             //RESPONSE
