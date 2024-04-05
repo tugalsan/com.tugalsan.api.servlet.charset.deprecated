@@ -2,11 +2,11 @@ package com.tugalsan.api.servlet.charset.deprecated.server;
 
 import javax.servlet.*;
 import javax.servlet.annotation.*;
-import javax.servlet.http.HttpServletRequest;
 import com.tugalsan.api.charset.client.*;
 import com.tugalsan.api.file.client.TGS_FileTypes;
 import com.tugalsan.api.log.server.*;
-import com.tugalsan.api.unsafe.client.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 @WebFilter(
         urlPatterns = {"/*"},
@@ -20,22 +20,23 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
 
     @Override
     public void init(FilterConfig config) {
-        TGS_UnSafe.run(() -> {
-            encoding = config.getInitParameter("requestEncoding");
-            if (encoding == null) {
-                encoding = TGS_CharSetUTF8.UTF8;
-            }
-        });
+        encoding = config.getInitParameter("requestEncoding");
+        if (encoding == null) {
+            encoding = TGS_CharSetUTF8.UTF8;
+        }
     }
     private String encoding;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain next) {
-        TGS_UnSafe.run(() -> {
-
+        try {
             //REQUEST.COMMON
             if (null == request.getCharacterEncoding()) {
-                request.setCharacterEncoding(encoding);
+                try {
+                    request.setCharacterEncoding(encoding);
+                } catch (UnsupportedEncodingException ex) {
+                    d.ce("doFilter", "skipped step", ex);
+                }
             }
 
             //REQUEST.TEXT
@@ -49,17 +50,18 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
 
             //ESCALATE
             next.doFilter(request, response);
-        }, e -> {
-            if (e.getClass().getName().equals("org.apache.catalina.connector.ClientAbortException")) {
-                if (request instanceof HttpServletRequest hsr) {
-                    d.cr("doFilter", "CLIENT GAVE UP", e.getMessage(), hsr.getRequestURL().toString() + "?" + hsr.getQueryString());
-                } else {
-                    d.cr("doFilter", "CLIENT GAVE UP", e.getMessage());
-                }
-                return;
-            }
-            TGS_UnSafe.run(() -> next.doFilter(request, response));//ESCALATE WITHOUT DEF_CHARSET
-        });
+//        if (e.getClass().getName().equals("org.apache.catalina.connector.ClientAbortException")) {
+//            if (request instanceof HttpServletRequest hsr) {
+//                d.cr("doFilter", "CLIENT GAVE UP", e.getMessage(), hsr.getRequestURL().toString() + "?" + hsr.getQueryString());
+//            } else {
+//                d.cr("doFilter", "CLIENT GAVE UP", e.getMessage());
+//            }
+//            return;
+//        }
+//        TGS_UnSafe.run(() -> next.doFilter(request, response));//ESCALATE WITHOUT DEF_CHARSET
+        } catch (IOException | ServletException ex) {
+            d.ce("doFilter", "chain stopped", ex);
+        }
     }
 
     @Override
