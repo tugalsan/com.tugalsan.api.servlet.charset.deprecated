@@ -11,7 +11,7 @@ import com.tugalsan.api.unsafe.client.*;
 @WebFilter(
         urlPatterns = {"/*"},
         initParams = {
-            @WebInitParam(name = "requestEncoding", value = TGS_CharSetUTF8.UTF8)
+            @WebInitParam(name = "requestEncoding", value = Utf8.UTF8)
         }
 )
 public class TS_SCharSetWebFilterUTF8 implements Filter {
@@ -23,7 +23,7 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
         TGS_UnSafe.run(() -> {
             encoding = config.getInitParameter("requestEncoding");
             if (encoding == null) {
-                encoding = TGS_CharSetUTF8.UTF8;
+                encoding = Utf8.UTF8;
             }
         });
     }
@@ -45,7 +45,7 @@ public class TS_SCharSetWebFilterUTF8 implements Filter {
             }
 
             //RESPONSE
-            response.setCharacterEncoding(TGS_CharSetUTF8.UTF8);
+            response.setCharacterEncoding(Utf8.UTF8);
 
             //ESCALATE
             next.doFilter(request, response);
